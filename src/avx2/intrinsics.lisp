@@ -1,0 +1,11 @@
+(in-package :fast-arithmetic.avx2)
+
+(cl:macrolet ((define-stub (name)
+             `(cl:defun ,name (x y)
+                (,name x y))))
+  (define-stub f8+)
+  (define-stub f8*)
+  (define-stub f8-)
+  (define-stub d4+)
+  (define-stub d4*)
+  (define-stub d4-))
