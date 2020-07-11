@@ -9,3 +9,9 @@
   (define-stub d4+)
   (define-stub d4*)
   (define-stub d4-))
+
+(cl:macrolet ((define-stub (name)
+             `(cl:defun ,name (y a x)
+                (,name y a x))))
+  (define-stub f8-fma)
+  (define-stub d4-fma))

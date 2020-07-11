@@ -7,10 +7,12 @@
    #:f8+
    #:f8*
    #:f8-
+   #:f8-fma
 
    #:d4
    #:replicate-double
    #:d4+
    #:d4*
    #:d4-
+   #:d4-fma
    ))
