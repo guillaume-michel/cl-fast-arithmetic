@@ -30,6 +30,17 @@
          (ea 0 vector index 4)
          reg)))
 
+(define-vop (fast-arithmetic.avx2::f8-broadcast)
+  (:translate fast-arithmetic.avx2::f8-broadcast)
+  (:policy :fast-safe)
+  (:args (value :scs (single-reg) :target r))
+  (:arg-types single-float)
+  (:results (r :scs (single-avx2-reg) :from (:argument 0)))
+  (:result-types simd-pack-256-single)
+  (:generator
+   1
+   (inst vbroadcastss r value)))
+
 (define-vop (fast-arithmetic.avx2::f8+)
   (:translate fast-arithmetic.avx2::f8+)
   (:policy :fast-safe)
@@ -74,14 +85,14 @@
   (:arg-types simd-pack-256-single
               simd-pack-256-single
               simd-pack-256-single)
-  (:results (r :scs (single-avx2-reg)))
+  (:results (r :scs (single-avx2-reg) :from (:argument 0)))
   (:result-types simd-pack-256-single)
   (:generator 4
               (cond ((location= r y)
                      (inst vfmadd231ps r a x))
                     (t
-                     (move r y)
-                     (inst vfmadd231ps r a x)))))
+                     (inst vfmadd231ps y a x)
+                     (move r y)))))
 
 (define-vop (fast-arithmetic.avx2::d4-load)
   (:translate fast-arithmetic.avx2::d4-load)
@@ -112,6 +123,17 @@
    (inst vmovupd
          (ea 0 vector index 8)
          reg)))
+
+(define-vop (fast-arithmetic.avx2::d4-broadcast)
+  (:translate fast-arithmetic.avx2::d4-broadcast)
+  (:policy :fast-safe)
+  (:args (value :scs (double-reg) :target r))
+  (:arg-types double-float)
+  (:results (r :scs (double-avx2-reg) :from (:argument 0)))
+  (:result-types simd-pack-256-double)
+  (:generator
+   1
+   (inst vbroadcastsd r value)))
 
 (define-vop (fast-arithmetic.avx2::d4+)
   (:translate fast-arithmetic.avx2::d4+)
@@ -157,11 +179,11 @@
   (:arg-types simd-pack-256-double
               simd-pack-256-double
               simd-pack-256-double)
-  (:results (r :scs (double-avx2-reg)))
+  (:results (r :scs (double-avx2-reg) :from (:argument 0)))
   (:result-types simd-pack-256-double)
   (:generator 4
               (cond ((location= r y)
                      (inst vfmadd231pd r a x))
                     (t
-                     (move r y)
-                     (inst vfmadd231pd r a x)))))
+                     (inst vfmadd231pd y a x)
+                     (move r y)))))

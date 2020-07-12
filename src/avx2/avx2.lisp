@@ -5,11 +5,11 @@
 
 (cl:declaim (cl:inline replicate-float))
 (cl:defun replicate-float (x)
-  (sb-ext:%make-simd-pack-256-single x x x x x x x x))
+  (f8-broadcast x))
 
 (cl:deftype d4 ()
   '(sb-ext:simd-pack-256 cl:double-float))
 
 (cl:declaim (cl:inline replicate-double))
 (cl:defun replicate-double (x)
-  (sb-ext:%make-simd-pack-256-double x x x x))
+  (d4-broadcast x))

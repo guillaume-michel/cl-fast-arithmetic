@@ -6,6 +6,7 @@
    #:replicate-float
    #:f8-load
    #:f8-store
+   #:f8-broadcast
    #:f8+
    #:f8*
    #:f8-
@@ -15,6 +16,7 @@
    #:replicate-double
    #:d4-load
    #:d4-store
+   #:d4-broadcast
    #:d4+
    #:d4*
    #:d4-

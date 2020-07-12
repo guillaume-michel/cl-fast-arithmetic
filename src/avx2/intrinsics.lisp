@@ -13,6 +13,12 @@
   (define-stub d4-store))
 
 (cl:macrolet ((define-stub (name)
+             `(cl:defun ,name (value)
+                (,name value))))
+  (define-stub f8-broadcast)
+  (define-stub d4-broadcast))
+
+(cl:macrolet ((define-stub (name)
              `(cl:defun ,name (x y)
                 (,name x y))))
   (define-stub f8+)
