@@ -4,6 +4,8 @@
   (:export
    #:f8
    #:replicate-float
+   #:f8-load
+   #:f8-store
    #:f8+
    #:f8*
    #:f8-
@@ -11,6 +13,8 @@
 
    #:d4
    #:replicate-double
+   #:d4-load
+   #:d4-store
    #:d4+
    #:d4*
    #:d4-

@@ -1,5 +1,35 @@
 (in-package :sb-vm)
 
+(define-vop (fast-arithmetic.avx2::f8-load)
+  (:translate fast-arithmetic.avx2::f8-load)
+  (:policy :fast-safe)
+  (:args (index :scs (unsigned-reg))
+         (vector :scs (sap-reg)))
+  (:arg-types unsigned-num
+              system-area-pointer)
+  (:results (r :scs (single-avx2-reg)))
+  (:result-types simd-pack-256-single)
+  (:generator
+   1
+   (inst vmovups
+         r
+         (ea 0 vector index 4))))
+
+(define-vop (fast-arithmetic.avx2::f8-store)
+  (:translate fast-arithmetic.avx2::f8-store)
+  (:policy :fast-safe)
+  (:args (index :scs (unsigned-reg))
+         (vector :scs (sap-reg))
+         (reg :scs (single-avx2-reg)))
+  (:arg-types unsigned-num
+              system-area-pointer
+              simd-pack-256-single)
+  (:generator
+   1
+   (inst vmovups
+         (ea 0 vector index 4)
+         reg)))
+
 (define-vop (fast-arithmetic.avx2::f8+)
   (:translate fast-arithmetic.avx2::f8+)
   (:policy :fast-safe)
@@ -52,6 +82,36 @@
                     (t
                      (move r y)
                      (inst vfmadd231ps r a x)))))
+
+(define-vop (fast-arithmetic.avx2::d4-load)
+  (:translate fast-arithmetic.avx2::d4-load)
+  (:policy :fast-safe)
+  (:args (index :scs (unsigned-reg))
+         (vector :scs (sap-reg)))
+  (:arg-types unsigned-num
+              system-area-pointer)
+  (:results (r :scs (double-avx2-reg)))
+  (:result-types simd-pack-256-double)
+  (:generator
+   1
+   (inst vmovupd
+         r
+         (ea 0 vector index 8))))
+
+(define-vop (fast-arithmetic.avx2::d4-store)
+  (:translate fast-arithmetic.avx2::d4-store)
+  (:policy :fast-safe)
+  (:args (index :scs (unsigned-reg))
+         (vector :scs (sap-reg))
+         (reg :scs (double-avx2-reg)))
+  (:arg-types unsigned-num
+              system-area-pointer
+              simd-pack-256-double)
+  (:generator
+   1
+   (inst vmovupd
+         (ea 0 vector index 8)
+         reg)))
 
 (define-vop (fast-arithmetic.avx2::d4+)
   (:translate fast-arithmetic.avx2::d4+)

@@ -1,9 +1,63 @@
 (in-package :fast-arithmetic-tests.avx2)
 
+(declaim (inline simple-array-vector))
+(defun simple-array-vector (array)
+  (declare (simple-array array))
+  (if (sb-kernel:array-header-p array)
+      (sb-kernel:%array-data array)
+      array))
+
 (fiveam:def-suite avx2-test-suite
     :description "Fast arithmetic AVX2 test suite.")
 
 (fiveam:in-suite avx2-test-suite)
+
+(fiveam:test load-float
+  (let ((x (make-array 16 :element-type 'single-float
+                       :initial-contents '(0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0 15.0))))
+    (multiple-value-bind (v0 v1 v2 v3 v4 v5 v6 v7)
+        (sb-ext:%simd-pack-256-singles
+         (let ((data-x (simple-array-vector x)))
+           (sb-sys:with-pinned-objects (data-x)
+             (let ((sap-x (sb-sys:vector-sap data-x)))
+               (avx2:f8-load 0 sap-x)))))
+      (fiveam:is (equalp v0 0.0))
+      (fiveam:is (equalp v1 1.0))
+      (fiveam:is (equalp v2 2.0))
+      (fiveam:is (equalp v3 3.0))
+      (fiveam:is (equalp v4 4.0))
+      (fiveam:is (equalp v5 5.0))
+      (fiveam:is (equalp v6 6.0))
+      (fiveam:is (equalp v7 7.0)))
+    (multiple-value-bind (v0 v1 v2 v3 v4 v5 v6 v7)
+        (sb-ext:%simd-pack-256-singles
+         (let ((data-x (simple-array-vector x)))
+           (sb-sys:with-pinned-objects (data-x)
+             (let ((sap-x (sb-sys:vector-sap data-x)))
+               (avx2:f8-load 8 sap-x)))))
+      (fiveam:is (equalp v0 8.0))
+      (fiveam:is (equalp v1 9.0))
+      (fiveam:is (equalp v2 10.0))
+      (fiveam:is (equalp v3 11.0))
+      (fiveam:is (equalp v4 12.0))
+      (fiveam:is (equalp v5 13.0))
+      (fiveam:is (equalp v6 14.0))
+      (fiveam:is (equalp v7 15.0)))))
+
+(fiveam:test store-float
+  (let* ((val 100.0)
+         (aval (make-array 16
+                           :element-type 'single-float
+                           :initial-element val))
+         (x (make-array 16
+                        :element-type 'single-float
+                        :initial-contents '(0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 10.0 11.0 12.0 13.0 14.0 15.0)))
+         (data-x (simple-array-vector x)))
+    (sb-sys:with-pinned-objects (data-x)
+      (let ((sap-x (sb-sys:vector-sap data-x)))
+        (avx2:f8-store 0 sap-x (avx2:replicate-float val))
+        (avx2:f8-store 8 sap-x (avx2:replicate-float val))))
+    (fiveam:is (equalp x aval))))
 
 (fiveam:test replicate-float
   (let ((x 1.0))
@@ -83,6 +137,45 @@
       (fiveam:is (equalp v5 res))
       (fiveam:is (equalp v6 res))
       (fiveam:is (equalp v7 res)))))
+
+(fiveam:test load-double
+  (let ((x (make-array 8 :element-type 'double-float
+                       :initial-contents '(0.d0 1.d0 2.d0 3.d0 4.d0 5.d0 6.d0 7.d0))))
+    (multiple-value-bind (v0 v1 v2 v3)
+        (sb-ext:%simd-pack-256-doubles
+         (let ((data-x (simple-array-vector x)))
+           (sb-sys:with-pinned-objects (data-x)
+             (let ((sap-x (sb-sys:vector-sap data-x)))
+               (avx2:d4-load 0 sap-x)))))
+      (fiveam:is (equalp v0 0.d0))
+      (fiveam:is (equalp v1 1.d0))
+      (fiveam:is (equalp v2 2.d0))
+      (fiveam:is (equalp v3 3.d0)))
+    (multiple-value-bind (v0 v1 v2 v3)
+        (sb-ext:%simd-pack-256-doubles
+         (let ((data-x (simple-array-vector x)))
+           (sb-sys:with-pinned-objects (data-x)
+             (let ((sap-x (sb-sys:vector-sap data-x)))
+               (avx2:d4-load 4 sap-x)))))
+      (fiveam:is (equalp v0 4.d0))
+      (fiveam:is (equalp v1 5.d0))
+      (fiveam:is (equalp v2 6.d0))
+      (fiveam:is (equalp v3 7.d0)))))
+
+(fiveam:test store-double
+  (let* ((val 100.d0)
+         (aval (make-array 8
+                           :element-type 'double-float
+                           :initial-element val))
+         (x (make-array 8
+                        :element-type 'double-float
+                        :initial-contents '(0.d0 1.d0 2.d0 3.d0 4.d0 5.d0 6.d0 7.d0)))
+         (data-x (simple-array-vector x)))
+    (sb-sys:with-pinned-objects (data-x)
+      (let ((sap-x (sb-sys:vector-sap data-x)))
+        (avx2:d4-store 0 sap-x (avx2:replicate-double val))
+        (avx2:d4-store 4 sap-x (avx2:replicate-double val))))
+    (fiveam:is (equalp x aval))))
 
 (fiveam:test replicate-double
   (let ((x 1.d0))

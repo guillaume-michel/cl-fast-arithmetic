@@ -1,6 +1,18 @@
 (in-package :fast-arithmetic.sse)
 
 (cl:macrolet ((define-stub (name)
+             `(cl:defun ,name (i ptr)
+                (,name i ptr))))
+  (define-stub f4-load)
+  (define-stub d2-load))
+
+(cl:macrolet ((define-stub (name)
+             `(cl:defun ,name (i ptr reg)
+                (,name i ptr reg))))
+  (define-stub f4-store)
+  (define-stub d2-store))
+
+(cl:macrolet ((define-stub (name)
              `(cl:defun ,name (x y)
                 (,name x y))))
   (define-stub f4+)

@@ -1,6 +1,18 @@
 (in-package :fast-arithmetic.avx2)
 
 (cl:macrolet ((define-stub (name)
+             `(cl:defun ,name (i ptr)
+                (,name i ptr))))
+  (define-stub f8-load)
+  (define-stub d4-load))
+
+(cl:macrolet ((define-stub (name)
+             `(cl:defun ,name (i ptr reg)
+                (,name i ptr reg))))
+  (define-stub f8-store)
+  (define-stub d4-store))
+
+(cl:macrolet ((define-stub (name)
              `(cl:defun ,name (x y)
                 (,name x y))))
   (define-stub f8+)
